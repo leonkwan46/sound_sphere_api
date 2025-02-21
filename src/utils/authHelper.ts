@@ -1,19 +1,19 @@
-import { User, UserDB } from 'src/Types/User'
+import { User, UserDB, UserType } from 'src/Types/User'
 import db from '../database/config'
 import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
 
 dotenv.config()
 
-export const createUser = async (email: string, firebaseUserId: string) => {
+export const createUser = async (email: string, firebaseUserId: string, userType: UserType) => {
     try {
         // Insert new user into the database
         const query = `
-            INSERT INTO users (email, firebase_user_id)
-            VALUES ($1, $2)
-            RETURNING id, username, email, firebase_user_id
+            INSERT INTO users (email, firebase_user_id, user_type)
+            VALUES ($1, $2, $3)
+            RETURNING id, username, email, firebase_user_id, user_type
         `
-        const values = [email, firebaseUserId]
+        const values = [email, firebaseUserId, userType]
         const result = await db.query(query, values)
 
         return result.rows[0]

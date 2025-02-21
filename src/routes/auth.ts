@@ -7,13 +7,13 @@ const router = express.Router()
 
 router.post('/register-with-firebase', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-        const { email, firebaseUserId } = req.body
+        const { email, firebaseUserId, userType } = req.body
         // Check if the user already exists
         const userExist = await getUserByEmail(email)
         if (userExist) throw new AppError('User already exists', 400)
 
         // Create a new user
-        const user = await createUser(email, firebaseUserId)
+        const user = await createUser(email, firebaseUserId, userType)
         console.log('user', user)
         if (!user) throw new AppError('User does not exist', 400)
         

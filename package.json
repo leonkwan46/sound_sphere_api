@@ -6,13 +6,15 @@
   "scripts": {
     "build": "node build.js",
     "start": "node dist/app.js",
-    "dev": "nodemon --exec node --loader ts-node/esm src/app.ts"
+    "dev": "nodemon --exec node --loader ts-node/esm src/app.ts",
+    "migrate": "node --loader ts-node/esm src/database/migrate.ts"
   },
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
     "bcrypt": "^5.1.1",
+    "chalk": "^5.4.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",

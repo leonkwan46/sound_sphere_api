@@ -1,4 +1,4 @@
-import { User, UserDB, UserType } from 'src/Types/User'
+import { User, RawUser, UserType } from 'src/Types/User'
 import db from '../database/config'
 import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
@@ -53,7 +53,7 @@ export const updateUser = async (
     }
 }
 
-export const getUserByEmail = async (email: string): Promise<UserDB | null> => {
+export const getUserByEmail = async (email: string): Promise<RawUser | null> => {
     try {
         const query = 'SELECT * FROM users WHERE email = $1 LIMIT 1'
         const values = [email]
@@ -64,7 +64,7 @@ export const getUserByEmail = async (email: string): Promise<UserDB | null> => {
     }
 }
 
-export const getUserById = async (userId: string | number): Promise<UserDB | null> => {
+export const getUserById = async (userId: string | number): Promise<RawUser | null> => {
     const id = parseInt(userId.toString())
     try {
         const query = 'SELECT * FROM users WHERE id = $1 LIMIT 1'
@@ -76,7 +76,8 @@ export const getUserById = async (userId: string | number): Promise<UserDB | nul
     }
 }
 
-export const getUserByUsername = async (username: string): Promise<UserDB | null> => {
+export const getUserByUsername = async (username: string): Promise<RawUser | null> => {
+    username = username.toLowerCase()
     try {
         const query = 'SELECT * FROM users WHERE username = $1 LIMIT 1'
         const values = [username]
@@ -87,7 +88,7 @@ export const getUserByUsername = async (username: string): Promise<UserDB | null
     }
 }
 
-export const generateAuthToken = (user: UserDB): string => {
+export const generateAuthToken = (user: RawUser): string => {
     try {
         if (!process.env.JWT_SECRET) {
             throw new Error('JWT_SECRET is not defined')
@@ -100,15 +101,17 @@ export const generateAuthToken = (user: UserDB): string => {
     }
 }
 
-export const filterUser = (user: UserDB, firebaseId: string): User => {
+export const transformUser = (user: RawUser, firebaseId?: string): User => {
     return {
-        firebaseId: firebaseId,
+        firebaseId: firebaseId || user.firebase_user_id,
         email: user.email,
         username: user.username,
-        user_type: user.user_type,
-        first_name: user.first_name,
-        last_name: user.last_name,
-        age: user.age,
-        gender: user.gender
+        userType: user.user_type,
+        profile: {
+            firstName: user.first_name,
+            lastName: user.last_name,
+            age: user.age,
+            gender: user.gender
+        }
     }
 }

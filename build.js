@@ -41,4 +41,22 @@ for (const file of jsFiles) {
   fs.writeFileSync(file, content);
 }
 
-console.log('Build completed successfully with fixed imports!');
+// Copy config directory and its contents
+const configDir = path.join(process.cwd(), 'src', 'config');
+const distConfigDir = path.join(process.cwd(), 'dist', 'config');
+
+// Create dist/config directory if it doesn't exist
+if (!fs.existsSync(distConfigDir)) {
+  fs.mkdirSync(distConfigDir, { recursive: true });
+}
+
+// Copy all files from src/config to dist/config
+const configFiles = fs.readdirSync(configDir);
+for (const file of configFiles) {
+  const srcPath = path.join(configDir, file);
+  const destPath = path.join(distConfigDir, file);
+  fs.copyFileSync(srcPath, destPath);
+  console.log(`Copied ${srcPath} to ${destPath}`);
+}
+
+console.log('Build completed successfully with fixed imports and copied config files!');

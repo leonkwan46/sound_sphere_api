@@ -7,7 +7,7 @@ import { Request, Response } from 'express'
 import { IncomingHttpHeaders } from 'http'
 import { User } from '../Types/User'
 import { verifyIdToken } from '../utils/firebaseHelper'
-import { filterUser, getUserByEmail } from '../utils/authHelper'
+import { transformUser, getUserByEmail } from '../utils/authHelper'
 
 export interface RequestWithAuth extends Request {
     user?: User
@@ -28,16 +28,15 @@ const authHandler = async (req: RequestWithAuth, res: Response, next: NextFuncti
         // FIREBASE AUTH
         const firebaseUser = await verifyIdToken(token)
         if (!firebaseUser) throw new Error("Authentication failed: Token verification failed")
-        console.log('firebaseUser', firebaseUser)
 
         // Get user from database
         if (!firebaseUser.email) throw new Error("Authentication failed: User is missing")
         const user = await getUserByEmail(firebaseUser.email)
         if (!user) throw new Error("User not found")
-        const filteredUser = filterUser(user, firebaseUser.uid)
+        const transformedUser = transformUser(user, firebaseUser.uid)
 
         // Set user
-        req.user = filteredUser
+        req.user = transformedUser
         next()
     } catch (err) {
         next(err)

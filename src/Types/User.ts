@@ -1,4 +1,4 @@
-export interface UserDB {
+export interface RawUser {
     // Basic
     id: number
     firebase_user_id: string
@@ -11,21 +11,25 @@ export interface UserDB {
     last_name: string
     age: number
     // date_of_birth: Date
-    gender: String
+    gender: string
 }
 
 export interface FirebaseUser {
     email: string
     uid: string
-  }
+}
 
 export interface User {
     firebaseId: string
     email: string
     username: string
-    user_type: UserType
-    first_name: string
-    last_name: string
+    userType: UserType
+    profile: UserProfile
+}
+
+interface UserProfile {
+    firstName: string
+    lastName: string
     age: number
     // date_of_birth: Date
     gender: String

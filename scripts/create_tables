@@ -1,11 +1,68 @@
-// Create User Table
-`
+-- Enable UUID extension (only needed once per database)
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- ENUM type for task status
+CREATE TYPE task_status AS ENUM ('pending', 'in_progress', 'completed');
+
+-- User Table
 CREATE TABLE users (
-    id SERIAL PRIMARY KEY,
-    firebase_user_id VARCHAR(255) NOT NULL,
-    username VARCHAR(50),
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    firebase_user_id VARCHAR(255) UNIQUE NOT NULL,
     email VARCHAR(50) NOT NULL,
+    username VARCHAR(50),
     user_type VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    first_name VARCHAR(255),
+    last_name VARCHAR(255),
+    age INTEGER,
+    gender VARCHAR(50)
+);
+
+-- Student-Teacher Table (Many-to-Many Relationship)
+CREATE TABLE student_teacher (
+    student_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    teacher_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    PRIMARY KEY (student_id, teacher_id)
+);
+
+-- Homework Table
+CREATE TABLE homework (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    due_date DATE NOT NULL,
+    progress INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-`
+
+-- Task Table
+CREATE TABLE task (
+    id SERIAL PRIMARY KEY,
+    homework_id INT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    status ENUM('pending', 'in_progress', 'completed') DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (homework_id) REFERENCES homework(id) ON DELETE CASCADE
+);
+
+-- Audio File Table
+CREATE TABLE audio_file (
+    id SERIAL PRIMARY KEY,
+    task_id INT NOT NULL,
+    file_url VARCHAR(255) NOT NULL,
+    uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (task_id) REFERENCES task(id) ON DELETE CASCADE
+);
+
+-- Homework List Table
+CREATE TABLE homework_list (
+    id SERIAL PRIMARY KEY,
+    teacher_id INT NOT NULL,
+    student_id INT NOT NULL,
+    homework_id INT NOT NULL,
+    assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (teacher_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (homework_id) REFERENCES homework(id) ON DELETE CASCADE
+);

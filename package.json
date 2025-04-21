@@ -6,7 +6,8 @@
   "scripts": {
     "build": "node build.js",
     "start": "node dist/app.js",
-    "dev": "nodemon --exec node --loader ts-node/esm src/app.ts"
+    "dev": "nodemon --exec node --loader ts-node/esm src/app.ts",
+    "migrate": "node --loader ts-node/esm src/database/migrate.ts"
   },
   "author": "",
   "license": "ISC",

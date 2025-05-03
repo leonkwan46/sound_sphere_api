@@ -101,7 +101,7 @@ export const generateAuthToken = (user: RawUser): string => {
     }
 }
 
-export const transformUser = (user: RawUser, firebaseId?: string): User => {
+export const transformRawUser = (user: RawUser, firebaseId?: string): User => {
     return {
         firebaseId: firebaseId || user.firebase_user_id,
         email: user.email,

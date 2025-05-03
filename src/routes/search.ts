@@ -6,11 +6,13 @@ import { searchUsersByUsername } from '../utils/searchHelper'
 const router = express.Router()
 
 router.get('/search-username', authHandler, async (req: RequestWithAuth, res: Response, next: NextFunction) => {
+    const currentUser = req.user
+    if (!currentUser) throw new Error('Fail to get current user')
     try {
         const { username } = req.query // Use query params for GET requests
         if (!username || typeof username !== 'string') throw new AppError('Username query parameter is required', 400)
 
-        const users = await searchUsersByUsername(username)
+        const users = await searchUsersByUsername(username, currentUser.username)
         res.send(users)
         return
     } catch (error) {

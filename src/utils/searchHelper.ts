@@ -1,22 +1,26 @@
-import { User, UserType } from 'src/Types/User'
+import { User } from 'src/Types/User'
 import db from '../database/config'
 import dotenv from 'dotenv'
-import { transformUser } from './authHelper'
+import { transformRawUser } from './authHelper'
 
 
 dotenv.config()
 
-export const searchUsersByUsername = async (username: string): Promise<User[] | void[]> => {
+/* The line `const users = await searchUsersByUsername(username, currentUser?.username)` is
+calling the `searchUsersByUsername` function with two parameters: `username` and
+`currentUser?.username`. */
+export const searchUsersByUsername = async (username: string, currentUsername: string): Promise<User[] | void[]> => {
     try {
         const query = `
             SELECT * FROM users 
             WHERE username ILIKE $1
+            AND username != $2
         `
-        const values = [`%${username}%`]
+        const values = [`%${username}%`, currentUsername]
         const result = await db.query(query, values)
 
         const filteredUsers = result.rows.map(user =>
-            transformUser(user, user.firebase_user_id)
+            transformRawUser(user, user.firebase_user_id)
         )
 
         return filteredUsers
